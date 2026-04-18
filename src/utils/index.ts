@@ -14,3 +14,7 @@ export { applyFilters, extractUniqueLocations } from './filterRecords';
 export type { FilterableData, FilteredData } from './filterRecords';
 export { findRelatedRecords } from './findRelatedRecords';
 export type { RelatedRecord } from './findRelatedRecords';
+export { buildPodoTimeline } from './buildPodoTimeline';
+export type { TimelineEvent } from './buildPodoTimeline';
+export { computeSuspicionData } from './computeSuspicionData';
+export type { SuspicionData } from './computeSuspicionData';

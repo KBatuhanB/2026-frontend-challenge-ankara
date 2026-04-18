@@ -24,3 +24,17 @@
   gap: var(--space-md);
   animation: fadeIn 0.3s ease;
 }
+
+/* FAZ 5: Bonus bölümler grid — Timeline + MapView yan yana */
+.bonusGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-md);
+  animation: fadeIn 0.3s ease;
+}
+
+@media (max-width: 900px) {
+  .bonusGrid {
+    grid-template-columns: 1fr;
+  }
+}

@@ -23,6 +23,9 @@ import { DashboardLayout } from '../../templates/DashboardLayout/DashboardLayout
 import { CategoryAccordion } from '../../organisms/CategoryAccordion/CategoryAccordion';
 import { RecordDetailModal } from '../../organisms/RecordDetailModal/RecordDetailModal';
 import { PersonDetailModal } from '../../organisms/PersonDetailModal/PersonDetailModal';
+import { Timeline } from '../../organisms/Timeline/Timeline';
+import { SuspicionPanel } from '../../organisms/SuspicionPanel/SuspicionPanel';
+import { MapView } from '../../organisms/MapView/MapView';
 import { Spinner } from '../../atoms/Spinner/Spinner';
 import { ErrorMessage } from '../../atoms/ErrorMessage/ErrorMessage';
 import type { BaseRecord, RecordType } from '../../../types';
@@ -188,6 +191,15 @@ export function InvestigationPage() {
         onFilterToggle: handleFilterToggle,
       }}
     >
+      {/* ─── FAZ 5: Bonus Bölümler ─── */}
+      <SuspicionPanel data={allData} />
+
+      <div className={styles.bonusGrid}>
+        <Timeline data={allData} />
+        <MapView data={allData} />
+      </div>
+
+      {/* ─── Kategori Accordion'ları ─── */}
       <div className={styles.categories}>
         {CATEGORIES.map((category, index) => (
           <CategoryAccordion
