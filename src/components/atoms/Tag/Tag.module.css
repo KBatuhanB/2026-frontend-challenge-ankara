@@ -1,0 +1,61 @@
+/* Tag — Lokasyon/kişi etiket stilleri */
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: var(--radius-full);
+  font-family: var(--font-sans);
+  font-size: 0.75rem;
+  font-weight: 500;
+  line-height: 1.4;
+  white-space: nowrap;
+  transition:
+    background var(--transition-fast),
+    border-color var(--transition-fast),
+    color var(--transition-fast);
+}
+
+/* Variant: default — nötr gri */
+.default {
+  background: rgba(107, 114, 128, 0.1);
+  color: var(--color-text-secondary);
+  border: 1px solid var(--color-border);
+}
+
+/* Variant: location — mavi tonları (mekan göstergesi) */
+.location {
+  background: rgba(59, 130, 246, 0.08);
+  color: #93bbfc;
+  border: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+/* Variant: person — altın tonları (kişi göstergesi) */
+.person {
+  background: rgba(200, 165, 90, 0.08);
+  color: var(--color-accent-gold);
+  border: 1px solid rgba(200, 165, 90, 0.2);
+}
+
+/* Tıklanabilir durumda cursor ve hover efekti */
+.clickable {
+  cursor: pointer;
+}
+
+.clickable:hover {
+  border-color: var(--color-border-active);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+/* Aktif (seçili) durum — filtre chip'lerinde */
+.active {
+  background: rgba(200, 165, 90, 0.15);
+  border-color: var(--color-accent-gold);
+  color: var(--color-accent-gold);
+}
+
+/* Klavye odağı göstergesi (erişilebilirlik) */
+.clickable:focus-visible {
+  outline: 2px solid var(--color-accent-gold);
+  outline-offset: 2px;
+}

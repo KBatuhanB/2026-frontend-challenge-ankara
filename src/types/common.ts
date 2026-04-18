@@ -49,3 +49,11 @@ export type UrgencyLevel = 'low' | 'medium' | 'high';
  * Confidence seviyesi — anonim ihbarların güvenilirlik derecesi.
  */
 export type ConfidenceLevel = 'low' | 'medium' | 'high';
+
+/**
+ * Kayıt türü — 5 form kaynağından hangisi olduğunu ayırt eder.
+ * Neden string literal union?
+ * → Discriminated union pattern'inde switch-case ile exhaustive
+ *   tip kontrolü yapılabilir. Yanlış tür kullanımı derleme zamanında yakalanır.
+ */
+export type RecordType = 'checkin' | 'message' | 'sighting' | 'personalNote' | 'anonymousTip';

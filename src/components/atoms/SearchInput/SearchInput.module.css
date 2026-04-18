@@ -1,0 +1,56 @@
+/* SearchInput — Arama giriş alanı stilleri */
+
+.wrapper {
+  position: relative;
+  width: 100%;
+}
+
+/* CSS-only büyüteç ikonu — harici ikon kütüphanesi gerektirmez */
+.icon {
+  position: absolute;
+  left: var(--space-md);
+  top: 50%;
+  transform: translateY(-50%);
+  width: 14px;
+  height: 14px;
+  border: 2px solid var(--color-text-muted);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.icon::after {
+  content: '';
+  position: absolute;
+  width: 6px;
+  height: 2px;
+  background: var(--color-text-muted);
+  bottom: -3px;
+  right: -4px;
+  transform: rotate(45deg);
+  border-radius: 1px;
+}
+
+.input {
+  width: 100%;
+  padding: var(--space-sm) var(--space-md) var(--space-sm) calc(var(--space-md) + 28px);
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  color: var(--color-text-primary);
+  font-family: var(--font-sans);
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  transition:
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast);
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--color-accent-gold);
+  box-shadow: 0 0 0 2px rgba(200, 165, 90, 0.15);
+}
+
+.input::placeholder {
+  color: var(--color-text-muted);
+}

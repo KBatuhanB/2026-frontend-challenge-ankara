@@ -10,7 +10,7 @@
  *   Ayrıca modül bağımlılıklarını tek bir yerden kontrol etmeyi kolaylaştırır.
  */
 
-export type { BaseRecord, UrgencyLevel, ConfidenceLevel } from './common';
+export type { BaseRecord, UrgencyLevel, ConfidenceLevel, RecordType } from './common';
 export type { Checkin } from './checkin';
 export type { Message } from './message';
 export type { Sighting } from './sighting';

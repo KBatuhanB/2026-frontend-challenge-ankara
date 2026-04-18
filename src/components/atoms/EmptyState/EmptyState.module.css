@@ -1,0 +1,45 @@
+/* EmptyState — Boş veri durumu stilleri */
+
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-2xl) var(--space-lg);
+  text-align: center;
+}
+
+/* Minimalist çizgi ikonu — 3 yatay çizgi (boş dosya hissi) */
+.icon {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  opacity: 0.3;
+}
+
+.line {
+  display: block;
+  height: 2px;
+  border-radius: 1px;
+  background: var(--color-text-muted);
+}
+
+.line:nth-child(1) {
+  width: 32px;
+}
+
+.line:nth-child(2) {
+  width: 24px;
+}
+
+.line:nth-child(3) {
+  width: 16px;
+}
+
+.message {
+  color: var(--color-text-muted);
+  font-size: 0.875rem;
+  line-height: 1.5;
+  max-width: 320px;
+}

@@ -1,0 +1,85 @@
+/* TimelineEntry — Zaman çizelgesi giriş stilleri */
+
+.entry {
+  display: flex;
+  gap: var(--space-md);
+  min-height: 48px;
+}
+
+/* Dikey çizgi + nokta track'i */
+.track {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-shrink: 0;
+  width: 16px;
+  padding-top: 4px;
+}
+
+/* Zaman çizelgesi noktası */
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--color-accent-gold);
+  border: 2px solid var(--color-bg-primary);
+  box-shadow: 0 0 0 2px rgba(200, 165, 90, 0.3);
+  flex-shrink: 0;
+}
+
+/* Noktalar arası bağlantı çizgisi */
+.line {
+  flex: 1;
+  width: 2px;
+  min-height: 24px;
+  background: var(--color-border);
+  margin-top: 4px;
+}
+
+/* İçerik alanı */
+.content {
+  flex: 1;
+  padding-bottom: var(--space-md);
+}
+
+/* Zaman + lokasyon satırı */
+.meta {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-sm);
+  margin-bottom: 2px;
+}
+
+.time {
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--color-text-primary);
+  letter-spacing: 0.02em;
+}
+
+.location {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+}
+
+.description {
+  font-size: 0.8125rem;
+  color: var(--color-text-secondary);
+  line-height: 1.5;
+}
+
+/* Vurgulu (kritik) olay — kırmızı tonları */
+.highlight .dot {
+  background: var(--color-accent-high);
+  box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.3);
+}
+
+.highlight .time {
+  color: var(--color-accent-high);
+}
+
+.highlight .description {
+  color: var(--color-text-primary);
+  font-weight: 500;
+}

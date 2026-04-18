@@ -1,0 +1,17 @@
+/* FilterBar — Filtre çubuğu stilleri */
+
+.bar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-xs) 0;
+  overflow-x: auto;
+
+  /* Yatay kaydırma çubuğunu gizle ama kaydırmayı koru */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.bar::-webkit-scrollbar {
+  display: none;
+}

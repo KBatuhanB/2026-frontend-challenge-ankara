@@ -61,10 +61,23 @@
   --radius-xl: 16px;
   --radius-full: 9999px;
 
-  /* Tipografi */
-  --font-sans: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  /* Kategori renkleri — her form tipi için ayırt edici aksanlar */
+  --category-checkins: #3b82f6;
+  --category-messages: #f59e0b;
+  --category-sightings: #14b8a6;
+  --category-notes: #a78bfa;
+  --category-tips: #ef4444;
+
+  /* Sıcak altın aksan — soruşturma dosyası/delil işareti hissi */
+  --color-accent-gold: #c8a55a;
+
+  /* Tipografi — Generic AI estetiğinden kaçınmak için özenle seçildi.
+     Playfair Display: Yüksek kontrastlı serif — gazete soruşturma başlığı.
+     DM Sans: Geometrik sans — modern ama Inter/Roboto'dan farklı.
+     JetBrains Mono: Veri alanları, timestamps, teknik detaylar. */
+  --font-sans: 'DM Sans', system-ui, -apple-system, sans-serif;
   --font-mono: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
-  --font-display: 'Space Grotesk', 'Inter', sans-serif;
+  --font-display: 'Playfair Display', Georgia, serif;
 
   /* Geçiş süreleri */
   --transition-fast: 150ms ease;
@@ -101,11 +114,14 @@ html {
 
 body {
   font-family: var(--font-sans);
-  background-color: var(--color-bg-primary);
+  /* Düz renk yerine radial gradient — üstte sıcak altın ton
+     derinlik ve atmosfer yaratır, soruşturma masası hissi verir */
+  background:
+    radial-gradient(ellipse at top center, rgba(200, 165, 90, 0.04) 0%, transparent 60%),
+    var(--color-bg-primary);
   color: var(--color-text-primary);
   line-height: 1.6;
   min-height: 100vh;
-  /* Sayfa geçişlerinde arka plan renginin kaymamasını sağlar */
   overflow-x: hidden;
 }
 
@@ -168,12 +184,39 @@ a:hover {
   flex-direction: column;
 }
 
+/* Uygulama kök wrapper — layout sorumluluğu DashboardLayout template'ine aittir.
+   Burada sadece minimum yapısal stil tanımlanır. */
 .app {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
   min-height: 100vh;
-  padding: var(--space-xl);
-  text-align: center;
+}
+
+/* ─── Animasyon Keyframes ─── */
+
+/* Spinner döndürme animasyonu */
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Bileşen giriş animasyonu — sayfa yüklendiğinde hafif kayma + fade */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Accordion açılış animasyonu — yukarıdan aşağı kayma */
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }

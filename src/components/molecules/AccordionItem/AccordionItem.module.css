@@ -1,0 +1,100 @@
+/* AccordionItem — Açılır-kapanır liste stilleri */
+
+.item {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-secondary);
+  overflow: hidden;
+  transition: border-color var(--transition-fast);
+}
+
+.item:hover {
+  border-color: var(--color-border-active);
+}
+
+/* Başlık butonu — tüm satır tıklanabilir */
+.header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  width: 100%;
+  padding: var(--space-sm) var(--space-md);
+  background: transparent;
+  border: none;
+  color: var(--color-text-primary);
+  font-family: var(--font-sans);
+  font-size: 0.875rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  text-align: left;
+  transition: background var(--transition-fast);
+}
+
+.header:hover {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.header:focus-visible {
+  outline: 2px solid var(--color-accent-gold);
+  outline-offset: -2px;
+}
+
+/* Sol kenar aksan çizgisi — kategori rengini gösterir */
+.accentBar {
+  width: 3px;
+  align-self: stretch;
+  margin: -8px 4px -8px -16px;
+  border-radius: 0 2px 2px 0;
+  background: var(--accent, var(--color-accent-gold));
+}
+
+/* Ok ikonu — CSS border triangle */
+.arrow {
+  display: inline-block;
+  width: 0;
+  height: 0;
+  border-left: 5px solid var(--color-text-muted);
+  border-top: 4px solid transparent;
+  border-bottom: 4px solid transparent;
+  flex-shrink: 0;
+  transition: transform var(--transition-normal);
+}
+
+.arrowOpen {
+  transform: rotate(90deg);
+}
+
+.title {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Kayıt sayacı — sağ tarafa hizalı, muted stil */
+.count {
+  padding: 1px 8px;
+  border-radius: var(--radius-full);
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--color-text-muted);
+  font-size: 0.75rem;
+  font-weight: 500;
+  flex-shrink: 0;
+}
+
+/* Grid-based açılma/kapanma animasyonu */
+.content {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows var(--transition-normal);
+}
+
+.contentOpen {
+  grid-template-rows: 1fr;
+}
+
+.contentInner {
+  overflow: hidden;
+}
