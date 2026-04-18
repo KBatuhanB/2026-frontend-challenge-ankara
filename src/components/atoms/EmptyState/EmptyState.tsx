@@ -15,7 +15,7 @@ export interface EmptyStateProps {
 
 export function EmptyState({ message }: EmptyStateProps) {
   return (
-    <div className={styles.container}>
+    <div className={styles.container} role="status">
       {/* Basit çizgi ikon — dosya bulunamadı hissi */}
       <div className={styles.icon} aria-hidden="true">
         <span className={styles.line} />

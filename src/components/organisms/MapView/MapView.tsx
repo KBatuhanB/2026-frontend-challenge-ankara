@@ -183,6 +183,11 @@ export function MapView({ data }: MapViewProps) {
       </div>
 
       {/* Leaflet Harita */}
+      {markers.length === 0 && (
+        <div className={styles.emptyOverlay}>
+          <p>Koordinat verisi bulunamadı.</p>
+        </div>
+      )}
       <div className={styles.mapWrapper}>
         <MapContainer
           center={ANKARA_CENTER}

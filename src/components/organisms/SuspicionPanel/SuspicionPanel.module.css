@@ -5,6 +5,7 @@
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: var(--space-md);
+  animation: fadeIn 0.3s ease;
 }
 
 /* Tek kart */

@@ -109,7 +109,7 @@ export function SuspicionPanel({ data }: SuspicionPanelProps) {
       </div>
 
       {/* ─── İstatistik Bar ─── */}
-      <div className={styles.statsBar}>
+      <div className={styles.statsBar} role="group" aria-label="Soruşturma İstatistikleri">
         <StatItem value={suspicion.stats.totalRecords} label="Records" />
         <StatItem value={suspicion.stats.totalPersons} label="Persons" />
         <StatItem value={suspicion.stats.highAlertCount} label="High Alerts" accent />

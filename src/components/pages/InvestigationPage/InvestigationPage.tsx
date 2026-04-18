@@ -13,6 +13,7 @@
  *   Birinden diğerine geçiş mümkün (RecordDetail → PersonDetail → RecordDetail).
  */
 import { useState, useMemo, useCallback } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { useAllData } from '../../../api/hooks';
 import { useFilter } from '../../../context/FilterContext';
 import { applyFilters, extractUniqueLocations } from '../../../utils/filterRecords';
@@ -62,6 +63,7 @@ type DataMap = Record<string, readonly BaseRecord[]>;
 
 export function InvestigationPage() {
   const { isLoading, isError, error, ...data } = useAllData();
+  const queryClient = useQueryClient();
   const { state: filterState, setSearch, toggleSource } = useFilter();
 
   /* Modal state */
@@ -152,6 +154,16 @@ export function InvestigationPage() {
   const handleCloseRecord = useCallback(() => setSelectedRecord(null), []);
   const handleClosePerson = useCallback(() => setSelectedPerson(null), []);
 
+  /**
+   * Tüm sorguları yeniden çalıştır — hata durumunda retry.
+   * Neden invalidateQueries?
+   * → useAllData 5 ayrı query kullanıyor. Hepsini tek seferde
+   *   invalidate etmek en temiz yaklaşım.
+   */
+  const handleRetry = useCallback(() => {
+    void queryClient.invalidateQueries();
+  }, [queryClient]);
+
   /** PersonDetail → RecordDetail geçişi */
   const handlePersonRecordClick = useCallback((record: BaseRecord, type: RecordType) => {
     setSelectedPerson(null);
@@ -177,6 +189,7 @@ export function InvestigationPage() {
             error?.message ??
             'Veriler yüklenirken bir hata oluştu. Lütfen tekrar deneyin.'
           }
+          onRetry={handleRetry}
         />
       </div>
     );

@@ -16,3 +16,14 @@
   margin: 0 auto;
   padding: 0 var(--space-lg);
 }
+
+/* Mobilde padding azalt — dar ekranlarda içerik alanı kaybolmasın */
+@media (max-width: 480px) {
+  .content {
+    padding: 0 var(--space-md);
+  }
+
+  .main {
+    padding: var(--space-md) 0 var(--space-xl);
+  }
+}

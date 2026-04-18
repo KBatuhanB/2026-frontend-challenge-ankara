@@ -49,6 +49,35 @@ export function Modal({ isOpen, onClose, title, subtitle, children }: ModalProps
         e.stopPropagation();
         onClose();
       }
+
+      /**
+       * Focus trap — Tab tuşu modal dışına çıkmasın.
+       * Neden focus trap?
+       * → WCAG 2.1 SC 2.4.3 — modal açıkken odak modal içinde kalmalı.
+       *   Tab ile son focusable elemana ulaşılınca başa, Shift+Tab ile
+       *   ilk elemandan sonuncuya döner.
+       */
+      if (e.key === 'Tab' && modalRef.current) {
+        const focusableEls = modalRef.current.querySelectorAll<HTMLElement>(
+          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        );
+        if (focusableEls.length === 0) return;
+
+        const first = focusableEls[0];
+        const last = focusableEls[focusableEls.length - 1];
+
+        if (e.shiftKey) {
+          if (document.activeElement === first) {
+            e.preventDefault();
+            last.focus();
+          }
+        } else {
+          if (document.activeElement === last) {
+            e.preventDefault();
+            first.focus();
+          }
+        }
+      }
     },
     [onClose],
   );
