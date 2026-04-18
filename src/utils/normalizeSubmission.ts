@@ -111,7 +111,8 @@ export function normalizeSubmissions<T>(submissions: readonly JotformSubmission[
     /* Sadece aktif submission'ları al — silinmiş/arşivlenmiş kayıtları filtrele.
        Neden?
        → Jotform'da silinen submission'lar "DELETED" statüsüyle kalabilir.
-         Soruşturma sadece aktif kayıtlarla çalışmalı — silinmiş veri güvenilir değil. */
-    .filter((sub) => sub.status === 'ACTIVE')
+         Soruşturma sadece aktif kayıtlarla çalışmalı — silinmiş veri güvenilir değil.
+       Not: Jotform "ACTIVE" veya "CUSTOM" statüsünü kullanabilir, ikisi de geçerli. */
+    .filter((sub) => sub.status !== 'DELETED')
     .map((sub) => normalizeSubmission<T>(sub));
 }
