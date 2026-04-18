@@ -1,18 +1,21 @@
 /**
  * Ana uygulama bileşeni.
  *
- * Neden ayrı bir App bileşeni?
- * → React Query Provider main.tsx'te kalırken, sayfa yönlendirme ve
- *   global context provider'lar (FAZ 4'te FilterContext) bu seviyede yönetilecek.
- *   Şu an tek sayfa var, ancak yapı genişlemeye açık.
+ * Neden App seviyesinde FilterProvider?
+ * → FilterContext tüm sayfa ve modal'lar tarafından paylaşılır.
+ *   Provider en üst seviyede olmalı ki alt bileşenler erişebilsin.
+ *   React Query Provider main.tsx'te, domain context'ler App'te.
  */
+import { FilterProvider } from './context/FilterContext';
 import { InvestigationPage } from './components/pages/InvestigationPage/InvestigationPage';
 
 function App() {
   return (
-    <div className="app">
-      <InvestigationPage />
-    </div>
+    <FilterProvider>
+      <div className="app">
+        <InvestigationPage />
+      </div>
+    </FilterProvider>
   );
 }
 

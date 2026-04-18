@@ -10,3 +10,7 @@ export type { Coordinates } from './parseCoordinates';
 export { parseTimestamp, compareTimestamps } from './parseTimestamp';
 export { normalizeSubmission, normalizeSubmissions } from './normalizeSubmission';
 export { buildPersonProfiles } from './buildPersonProfiles';
+export { applyFilters, extractUniqueLocations } from './filterRecords';
+export type { FilterableData, FilteredData } from './filterRecords';
+export { findRelatedRecords } from './findRelatedRecords';
+export type { RelatedRecord } from './findRelatedRecords';

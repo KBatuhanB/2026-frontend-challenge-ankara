@@ -1,0 +1,124 @@
+/* PersonDetailModal — Kişi profil modal stilleri */
+
+/* Profil özet kartı */
+.profileSummary {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding-bottom: var(--space-md);
+  border-bottom: 1px solid var(--color-border);
+  margin-bottom: var(--space-md);
+}
+
+.avatar {
+  flex-shrink: 0;
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-full);
+  background: linear-gradient(135deg, var(--color-accent-gold), rgba(200, 165, 90, 0.6));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--color-bg-primary);
+}
+
+.profileInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.profileName {
+  font-family: var(--font-display);
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+.profileStat {
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
+}
+
+/* Kategori listesi */
+.categoryList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+/* Tek kategori bölümü */
+.categorySection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.categoryHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: var(--space-xs) 0;
+}
+
+.categoryIcon {
+  font-size: 0.875rem;
+  line-height: 1;
+}
+
+.categoryLabel {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.categoryCount {
+  margin-left: auto;
+  padding: 0 6px;
+  border-radius: var(--radius-full);
+  background: rgba(255, 255, 255, 0.05);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  line-height: 1.6;
+}
+
+/* Kayıt listesi */
+.recordList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+/* Kayıt tıklama butonu — semantik HTML, tüm RecordCard'ı saran buton */
+.recordButton {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  border-radius: var(--radius-md);
+  transition:
+    background var(--transition-fast),
+    transform var(--transition-fast);
+}
+
+.recordButton:hover {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.recordButton:active {
+  transform: scale(0.99);
+}
+
+.recordButton:focus-visible {
+  outline: 2px solid var(--color-accent-gold);
+  outline-offset: 2px;
+}

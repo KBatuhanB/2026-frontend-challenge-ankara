@@ -26,7 +26,9 @@
  *   - mentionedPeople virgülle ayrılmış → split ile her biri ayrı kişi olarak eklenir
  */
 
-import type { AllData } from '../api/hooks/useAllData';
+import type {
+  FilterableData,
+} from './filterRecords';
 import type {
   Person,
   Checkin,
@@ -112,7 +114,7 @@ function getOrCreateProfile(
  * // persons[0] = { name: "Aslı", checkins: [...], sentMessages: [...], ... }
  * ```
  */
-export function buildPersonProfiles(data: AllData): Person[] {
+export function buildPersonProfiles(data: FilterableData): Person[] {
   const profiles = new Map<string, MutablePersonProfile>();
 
   /* ─── 1. Checkins: personName alanı ─── */
