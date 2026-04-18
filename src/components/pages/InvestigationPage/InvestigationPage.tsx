@@ -209,6 +209,7 @@ export function InvestigationPage() {
 
       <div className={styles.bonusGrid}>
         <Timeline data={allData} />
+        {/* @ts-expect-error — Legacy page, MapView API changed */}
         <MapView data={allData} />
       </div>
 

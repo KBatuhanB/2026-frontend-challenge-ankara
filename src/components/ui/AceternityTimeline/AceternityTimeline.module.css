@@ -1,0 +1,220 @@
+/**
+ * AceternityTimeline — Aceternity UI Timeline bileşeni stilleri.
+ *
+ * Neden CSS Modules?
+ * → Proje genelinde tailwind yerine CSS Modules + CSS variables
+ *   kullanılıyor. Bu bileşen de aynı pattern'i takip eder.
+ *   Aceternity'nin tailwind class'ları burada CSS Modules'a dönüştürüldü.
+ *
+ * Scroll-beam efekti:
+ * → framer-motion ile kontrol edilen height/opacity, gradient çizgi
+ *   üzerinde "dolma" animasyonu oluşturur. Mask-image ile üst/alt fade.
+ */
+
+/* ─── Ana Konteyner ─── */
+.wrapper {
+  width: 100%;
+  font-family: var(--font-sans);
+}
+
+/* ─── Başlık Alanı ─── */
+.headerSection {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: var(--space-3xl) var(--space-md) var(--space-lg);
+}
+
+@media (min-width: 768px) {
+  .headerSection {
+    padding: var(--space-3xl) var(--space-xl) var(--space-lg);
+  }
+}
+
+/* ─── Timeline İçerik Alanı ─── */
+.timelineBody {
+  position: relative;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding-bottom: var(--space-3xl);
+}
+
+/* ─── Tek Timeline Satırı ─── */
+.entryRow {
+  display: flex;
+  justify-content: flex-start;
+  padding-top: var(--space-xl);
+  gap: var(--space-md);
+}
+
+@media (min-width: 768px) {
+  .entryRow {
+    padding-top: var(--space-3xl);
+    gap: var(--space-xl);
+  }
+}
+
+/* ─── Sol Sütun: Sticky Başlık + Nokta ─── */
+.stickyColumn {
+  position: sticky;
+  top: 160px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  align-self: flex-start;
+  z-index: var(--z-base);
+  max-width: 240px;
+}
+
+@media (min-width: 768px) {
+  .stickyColumn {
+    flex-direction: row;
+    width: 100%;
+    max-width: 320px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .stickyColumn {
+    max-width: 384px;
+  }
+}
+
+/* ─── Nokta (Dot) Konteyner ─── */
+.dotOuter {
+  height: 40px;
+  width: 40px;
+  border-radius: var(--radius-full);
+  background: var(--color-bg-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  left: 12px;
+  flex-shrink: 0;
+}
+
+.dotInner {
+  height: 16px;
+  width: 16px;
+  border-radius: var(--radius-full);
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border-active);
+  padding: 8px;
+  transition: background var(--transition-normal), border-color var(--transition-normal);
+}
+
+/* Highlight durumunda nokta kırmızı yanar — dikkat çekmesi için */
+.dotHighlight {
+  background: var(--color-accent-high);
+  border-color: var(--color-accent-high);
+  box-shadow: var(--shadow-glow-red);
+}
+
+/* ─── Başlık (Title) ─── */
+.titleDesktop {
+  display: none;
+  font-size: 1.25rem;
+  font-weight: 700;
+  font-family: var(--font-display);
+  color: var(--color-text-secondary);
+  padding-left: 80px;
+}
+
+@media (min-width: 768px) {
+  .titleDesktop {
+    display: block;
+    font-size: clamp(1.5rem, 3vw, 2.5rem);
+  }
+}
+
+.titleMobile {
+  display: block;
+  font-size: 1.5rem;
+  font-weight: 700;
+  font-family: var(--font-display);
+  color: var(--color-text-secondary);
+  margin-bottom: var(--space-md);
+  text-align: left;
+}
+
+@media (min-width: 768px) {
+  .titleMobile {
+    display: none;
+  }
+}
+
+/* Highlight olan başlık altın rengi ile parlar */
+.titleHighlight {
+  color: var(--color-accent-high);
+}
+
+/* ─── Sağ Sütun: İçerik ─── */
+.contentColumn {
+  position: relative;
+  padding-left: 80px;
+  padding-right: var(--space-md);
+  width: 100%;
+}
+
+@media (min-width: 768px) {
+  .contentColumn {
+    padding-left: var(--space-md);
+  }
+}
+
+/* ─── Dikey Çizgi (Track) — Arka Plan Gradient ─── */
+.trackContainer {
+  position: absolute;
+  left: 32px;
+  top: 0;
+  overflow: hidden;
+  width: 2px;
+
+  /* Dikey gradient — üst ve alt fade out */
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    var(--color-border-active) 10%,
+    var(--color-border-active) 90%,
+    transparent 100%
+  );
+
+  /* Mask ile kenar yumuşatma */
+  mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    black 10%,
+    black 90%,
+    transparent 100%
+  );
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    black 10%,
+    black 90%,
+    transparent 100%
+  );
+}
+
+@media (min-width: 768px) {
+  .trackContainer {
+    left: 32px;
+  }
+}
+
+/* ─── Scroll Beam — Dolgu Animasyonu ─── */
+.scrollBeam {
+  position: absolute;
+  inset: 0;
+  top: 0;
+  width: 2px;
+  border-radius: var(--radius-full);
+
+  /* Soruşturma teması: kırmızı → altın gradient beam */
+  background: linear-gradient(
+    to top,
+    var(--color-accent-high) 0%,
+    var(--color-accent-gold) 10%,
+    transparent 100%
+  );
+}

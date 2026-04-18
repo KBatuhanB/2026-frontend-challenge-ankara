@@ -1,274 +1,276 @@
 /**
- * MapView — Leaflet harita görselleştirmesi.
+ * MapView — Leaflet harita render bileşeni (Cluster Marker mimarisi).
  *
  * Neden organism?
- * → Birden fazla veri kaynağından koordinat, rota ve marker bilgisini alır.
- *   Leaflet kütüphanesinin konfigürasyonu + domain verisi dönüşümü = organism.
+ * → Leaflet kütüphanesinin React entegrasyonunu kapsüller.
+ *   Cluster marker'lar, polyline, tile layer ve click handler'ları yönetir.
+ *   Domain verisinden bağımsız — işlenmiş veri (clusters + route) alır.
  *
- * Harita içeriği:
- *   1. Marker'lar — Her sighting/checkin noktası (koordinat mevcut ise)
- *   2. Polyline — Podo'nun kronolojik rotası (timeline sırasıyla)
- *   3. Son görülme noktası — kırmızı marker ile vurgulanır
+ * MapPage'den farkı:
+ * → MapView sadece haritayı render eder. Detail panel, legend, stats gibi
+ *   üst katman elemanları MapPage'in sorumluluğundadır (SRP).
  *
- * Leaflet CSS:
- * → Leaflet node_modules'dan CSS import gerektirir. Vite bunu otomatik handle eder.
+ * Teknik:
+ * → react-leaflet ile deklaratif Leaflet kullanımı.
+ *   DivIcon ile CSS-only glow marker'lar (harici ikon gerektirmez).
+ *   Marker click → onLocationSelect callback ile parent'a bildirilir.
+ *   Map background click → onMapClick ile panel kapatılır.
+ *   Seçili marker'a smooth fly animasyonu (useMap).
  *
- * Performans:
- * → Marker ve polyline verileri useMemo ile memoize edilir.
- *   ~45 kayıt için hesaplama ihmal edilebilir.
- *
- * Edge case'ler:
- *   - Koordinatı olmayan kayıtlar → atlanır (parseCoordinates null döner)
- *   - Podo ile ilgili kayıt yoksa → polyline çizilmez
- *   - Harita yüklenmezse → CSS background fallback
+ * Marker tasarımı:
+ *   - Dış halka (radial gradient glow)
+ *   - İç nokta (solid renk + border + box-shadow)
+ *   - Sağ üst köşede olay sayısı badge'i
+ *   - Renk: kırmızı (son görülme), altın (Podo), mavi (normal)
+ *   - Son görülme + seçili: nabız (pulse) animasyonu
  */
-import { useMemo } from 'react';
-import { MapContainer, TileLayer, Marker, Popup, Polyline } from 'react-leaflet';
+import { useEffect } from 'react';
+import {
+  MapContainer,
+  TileLayer,
+  Marker,
+  Polyline,
+  useMap,
+  useMapEvents,
+} from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import { parseCoordinates } from '../../../utils/parseCoordinates';
-import { buildPodoTimeline } from '../../../utils/buildPodoTimeline';
-import type { FilterableData } from '../../../utils/filterRecords';
-import type { Checkin, Message, Sighting, BaseRecord, RecordType } from '../../../types';
-import { normalizeName } from '../../../utils/normalizeName';
+import type { LocationCluster } from '../../../utils/buildLocationClusters';
 import styles from './MapView.module.css';
 
+/* ─── Props ─── */
+
 export interface MapViewProps {
-  /** Tüm form verileri */
-  readonly data: FilterableData;
+  /** Lokasyon kümeleri — her marker bir cluster */
+  readonly clusters: readonly LocationCluster[];
+  /** Podo'nun kronolojik rota noktaları — polyline için */
+  readonly podoRoute: L.LatLngExpression[];
+  /** Seçili lokasyon adı — aktif marker vurgusu için */
+  readonly selectedLocationName: string | null;
+  /** Marker tıklandığında çağrılır */
+  readonly onLocationSelect: (cluster: LocationCluster) => void;
+  /** Harita boşluğuna tıklandığında çağrılır (panel kapatma) */
+  readonly onMapClick: () => void;
 }
 
-/**
- * Ankara merkez koordinatları.
- * Neden sabit?
- * → Tüm olaylar Ankara'da geçiyor. Harita her zaman buradan başlar.
- */
+/* ─── Sabitler ─── */
+
+/** Ankara merkez — tüm olaylar bu civarda */
 const ANKARA_CENTER: L.LatLngExpression = [39.925, 32.860];
 const DEFAULT_ZOOM = 13;
 
-/** Podo'nun normalize edilmiş adı */
-const PODO_NORMALIZED = normalizeName('Podo');
+/** Marker pulse animasyonu CSS — DivIcon inline HTML için global inject */
+const MARKER_KEYFRAMES_ID = 'mapview-marker-keyframes';
+const MARKER_KEYFRAMES_CSS = `
+  @keyframes mapview-pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.6; transform: scale(1.2); }
+  }
+`;
+
+/* ─── Marker İkon Oluşturucu ─── */
 
 /**
- * Marker ikonları — Leaflet default marker'ları CDN'den gelir ama
- * bundle'da kaybolabilir. Divicon ile CSS-only marker oluşturuyoruz.
+ * Cluster verisine göre özel DivIcon oluşturur.
  *
  * Neden DivIcon?
- * → Harici ikon dosyası gerektirmez. CSS ile tamamen kontrol edilir.
- *   Webpack/Vite asset path sorunları ortadan kalkar.
+ * → Harici ikon dosyası gerektirmez. CSS ile tam kontrol.
+ *   Vite/Webpack asset path sorunları ortadan kalkar.
+ *   Her cluster için boyut, renk ve animasyon dinamik.
+ *
+ * @param cluster - Lokasyon cluster verisi
+ * @param isSelected - Aktif seçili mi?
  */
-function createIcon(color: string, size = 12): L.DivIcon {
+function createClusterIcon(cluster: LocationCluster, isSelected: boolean): L.DivIcon {
+  /* Renk seçimi — soruşturma önceliğine göre kademeli */
+  const color = cluster.isLastSeen
+    ? '#ef4444'       /* Kırmızı: son görülme — en kritik */
+    : cluster.hasPodo
+      ? '#c8a55a'     /* Altın: Podo bulunmuş — dikkat çekici */
+      : '#3b82f6';    /* Mavi: normal aktivite noktası */
+
+  /* Boyut — olay yoğunluğuna orantılı, min/max sınırlı */
+  const baseSize = cluster.isLastSeen
+    ? 22
+    : Math.min(12 + cluster.totalEvents * 1.5, 24);
+  const coreSize = isSelected ? baseSize + 6 : baseSize;
+  const outerSize = coreSize + 22;
+
+  /* Pulse animasyonu yalnızca dikkat gerektiren marker'larda */
+  const shouldPulse = cluster.isLastSeen || isSelected;
+
+  /* Badge boyutu */
+  const badgeSize = 18;
+
+  const html = `
+    <div style="
+      position:relative;
+      width:${outerSize}px;
+      height:${outerSize}px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      cursor:pointer;
+    ">
+      <div style="
+        position:absolute;
+        width:${outerSize}px;
+        height:${outerSize}px;
+        border-radius:50%;
+        background:radial-gradient(circle, ${color}30 0%, transparent 70%);
+        ${shouldPulse ? 'animation:mapview-pulse 2s ease-in-out infinite;' : ''}
+      "></div>
+      <div style="
+        position:relative;
+        width:${coreSize}px;
+        height:${coreSize}px;
+        border-radius:50%;
+        background:${color};
+        border:2.5px solid rgba(255,255,255,${isSelected ? '0.9' : '0.5'});
+        box-shadow:0 0 ${isSelected ? 16 : 8}px ${color}80, 0 2px 6px rgba(0,0,0,0.3);
+        z-index:1;
+      "></div>
+      <div style="
+        position:absolute;
+        top:-3px;
+        right:0;
+        width:${badgeSize}px;
+        height:${badgeSize}px;
+        border-radius:50%;
+        background:rgba(10,14,23,0.92);
+        border:1.5px solid ${color};
+        color:${color};
+        font-size:9px;
+        font-weight:700;
+        font-family:'JetBrains Mono',Consolas,monospace;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        z-index:2;
+        line-height:1;
+      ">${cluster.totalEvents}</div>
+    </div>
+  `;
+
   return L.divIcon({
     className: '',
-    html: `<div style="
-      width:${size}px;
-      height:${size}px;
-      background:${color};
-      border:2px solid rgba(255,255,255,0.8);
-      border-radius:50%;
-      box-shadow:0 0 6px ${color}80;
-    "></div>`,
-    iconSize: [size, size],
-    iconAnchor: [size / 2, size / 2],
+    html,
+    iconSize: [outerSize, outerSize],
+    iconAnchor: [outerSize / 2, outerSize / 2],
   });
 }
 
-const ICON_NORMAL = createIcon('#3b82f6', 10);
-const ICON_LAST_SEEN = createIcon('#ef4444', 16);
-const ICON_SUSPECT = createIcon('#f59e0b', 12);
+/* ─── Yardımcı Bileşenler (MapContainer children olmalı) ─── */
 
-/** Harita marker verisi */
-interface MapMarker {
-  readonly id: string;
-  readonly lat: number;
-  readonly lon: number;
-  readonly label: string;
-  readonly time: string;
-  readonly location: string;
-  readonly icon: L.DivIcon;
+/**
+ * Seçili lokasyona smooth fly animasyonu.
+ * Neden ayrı bileşen?
+ * → useMap() hook'u MapContainer'ın child'ı içinde çağrılmalı.
+ *   React render tree'sinde MapContainer dışında kullanılamaz.
+ */
+function FlyToSelected({ lat, lon }: { lat: number; lon: number }) {
+  const map = useMap();
+
+  useEffect(() => {
+    map.flyTo([lat, lon], 15, { duration: 0.8 });
+  }, [lat, lon, map]);
+
+  return null;
 }
 
-export function MapView({ data }: MapViewProps) {
+/**
+ * Harita boşluğuna tıklama yakalayıcı.
+ * Neden ayrı bileşen?
+ * → useMapEvents hook'u MapContainer child'ı gerektirir.
+ *   Marker click'leri Leaflet seviyesinde propagation'ı durdurur,
+ *   bu yüzden map click yalnızca boşluğa tıklandığında ateşlenir.
+ */
+function MapClickHandler({ onClick }: { onClick: () => void }) {
+  useMapEvents({ click: onClick });
+  return null;
+}
+
+/* ─── Ana Bileşen ─── */
+
+export function MapView({
+  clusters,
+  podoRoute,
+  selectedLocationName,
+  onLocationSelect,
+  onMapClick,
+}: MapViewProps) {
   /**
-   * Podo'nun rotası — polyline noktaları.
-   * buildPodoTimeline'dan zaten kronolojik sıralı olaylar geliyor.
-   * Koordinatı geçerli olanları filtrele ve LatLng'ye dönüştür.
+   * Marker pulse animasyonu CSS'ini document head'e inject et.
+   * Neden useEffect?
+   * → DivIcon inline HTML, CSS Modules class'larına erişemez.
+   *   Global @keyframes tanımı gerekli. Bir kez inject, unmount'ta temizle.
    */
-  const podoRoute = useMemo(() => {
-    const events = buildPodoTimeline(data);
-    const points: L.LatLngExpression[] = [];
-    for (const ev of events) {
-      const coord = parseCoordinates(ev.coordinates);
-      if (coord) {
-        points.push([coord.lat, coord.lon]);
-      }
-    }
-    return points;
-  }, [data]);
+  useEffect(() => {
+    if (document.getElementById(MARKER_KEYFRAMES_ID)) return;
+    const style = document.createElement('style');
+    style.id = MARKER_KEYFRAMES_ID;
+    style.textContent = MARKER_KEYFRAMES_CSS;
+    document.head.appendChild(style);
+    return () => { document.getElementById(MARKER_KEYFRAMES_ID)?.remove(); };
+  }, []);
 
-  /**
-   * Tüm noktalardan marker verisi oluştur.
-   * Checkins + Sightings koordinatlı kayıtlardan marker çıkar.
-   */
-  const markers = useMemo(() => {
-    const result: MapMarker[] = [];
-    const seen = new Set<string>();
-
-    /* Podo timeline'dan son olay ID'sini al — kırmızı marker için */
-    const timeline = buildPodoTimeline(data);
-    const lastEventId = timeline.length > 0 ? timeline[timeline.length - 1].id : null;
-
-    const addMarker = (
-      record: BaseRecord,
-      label: string,
-      type: RecordType,
-    ) => {
-      if (seen.has(record.id)) return;
-      const coord = parseCoordinates(record.coordinates);
-      if (!coord) return;
-      seen.add(record.id);
-
-      /* İkon seçimi: son görülme → kırmızı, şüpheli → sarı, normal → mavi */
-      let icon = ICON_NORMAL;
-      if (record.id === lastEventId) {
-        icon = ICON_LAST_SEEN;
-      } else if (type === 'sighting') {
-        const s = record as Sighting;
-        const withNorm = normalizeName(s.seenWith);
-        /* Kağan ile ilgili sighting'ler sarı */
-        if (withNorm && withNorm !== PODO_NORMALIZED && withNorm !== 'unknown') {
-          icon = ICON_SUSPECT;
-        }
-      }
-
-      /* Timestamp'ten "HH:mm" çıkar */
-      const timeParts = record.timestamp.trim().split(/\s+/);
-      const time = timeParts.length >= 2 ? timeParts[1] : '';
-
-      result.push({
-        id: record.id,
-        lat: coord.lat,
-        lon: coord.lon,
-        label,
-        time,
-        location: record.location,
-        icon,
-      });
-    };
-
-    /* Checkins */
-    for (const r of data.checkins) {
-      addMarker(r, (r as Checkin).personName, 'checkin');
-    }
-
-    /* Sightings */
-    for (const r of data.sightings) {
-      const s = r as Sighting;
-      const label = s.seenWith && s.seenWith !== 'Unknown'
-        ? `${s.personName} + ${s.seenWith}`
-        : s.personName;
-      addMarker(r, label, 'sighting');
-    }
-
-    return result;
-  }, [data]);
+  /* Seçili cluster'ı bul — FlyTo koordinatları için */
+  const selectedCluster = selectedLocationName
+    ? clusters.find(c => c.locationName === selectedLocationName) ?? null
+    : null;
 
   return (
-    <section className={styles.container} aria-label="Soruşturma Haritası">
-      {/* Bölüm başlığı */}
-      <div className={styles.header}>
-        <span className={styles.headerIcon}>🗺</span>
-        <h2 className={styles.title}>Investigation Map</h2>
-        <span className={styles.markerCount}>{markers.length} points</span>
-      </div>
+    <div className={styles.mapWrapper}>
+      <MapContainer
+        center={ANKARA_CENTER}
+        zoom={DEFAULT_ZOOM}
+        className={styles.map}
+        scrollWheelZoom={true}
+        zoomControl={true}
+        attributionControl={true}
+      >
+        {/* Koyu tema tile — Case File Noir uyumlu */}
+        <TileLayer
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; <a href="https://carto.com/">CARTO</a>'
+          url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
+        />
 
-      {/* Leaflet Harita */}
-      {markers.length === 0 && (
-        <div className={styles.emptyOverlay}>
-          <p>Koordinat verisi bulunamadı.</p>
-        </div>
-      )}
-      <div className={styles.mapWrapper}>
-        <MapContainer
-          center={ANKARA_CENTER}
-          zoom={DEFAULT_ZOOM}
-          className={styles.map}
-          scrollWheelZoom={true}
-          attributionControl={true}
-        >
-          {/* Tile Layer — koyu tema (Case File Noir ile uyumlu) */}
-          <TileLayer
-            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/">CARTO</a>'
-            url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
+        {/* Podo'nun rotası — altın kesikli polyline */}
+        {podoRoute.length > 1 && (
+          <Polyline
+            positions={podoRoute}
+            pathOptions={{
+              color: '#c8a55a',
+              weight: 3,
+              opacity: 0.65,
+              dashArray: '10, 6',
+            }}
           />
+        )}
 
-          {/* Podo'nun rotası — sarımsı polyline */}
-          {podoRoute.length > 1 && (
-            <Polyline
-              positions={podoRoute}
-              pathOptions={{
-                color: '#c8a55a',
-                weight: 3,
-                opacity: 0.7,
-                dashArray: '8, 4',
-              }}
-            />
-          )}
+        {/* Lokasyon cluster marker'ları */}
+        {clusters.map((cluster) => (
+          <Marker
+            key={cluster.locationName}
+            position={[cluster.lat, cluster.lon]}
+            icon={createClusterIcon(
+              cluster,
+              cluster.locationName === selectedLocationName,
+            )}
+            eventHandlers={{
+              click: () => onLocationSelect(cluster),
+            }}
+          />
+        ))}
 
-          {/* Marker'lar */}
-          {markers.map((m) => (
-            <Marker
-              key={m.id}
-              position={[m.lat, m.lon]}
-              icon={m.icon}
-            >
-              <Popup>
-                <div className={styles.popup}>
-                  <strong>{m.label}</strong>
-                  <span>{m.time} — {m.location}</span>
-                </div>
-              </Popup>
-            </Marker>
-          ))}
-        </MapContainer>
-      </div>
+        {/* Seçili konuma fly animasyonu */}
+        {selectedCluster && (
+          <FlyToSelected lat={selectedCluster.lat} lon={selectedCluster.lon} />
+        )}
 
-      {/* Lejant */}
-      <div className={styles.legend}>
-        <LegendItem color="#3b82f6" label="Normal" />
-        <LegendItem color="#f59e0b" label="With others" />
-        <LegendItem color="#ef4444" label="Last seen" />
-        <LegendItem color="#c8a55a" label="Podo's route" isDashed />
-      </div>
-    </section>
-  );
-}
-
-/* ─── Yardımcı Bileşenler ─── */
-
-function LegendItem({
-  color,
-  label,
-  isDashed,
-}: {
-  color: string;
-  label: string;
-  isDashed?: boolean;
-}) {
-  return (
-    <div className={styles.legendItem}>
-      {isDashed ? (
-        <span
-          className={styles.legendLine}
-          style={{ borderColor: color }}
-        />
-      ) : (
-        <span
-          className={styles.legendDot}
-          style={{ background: color }}
-        />
-      )}
-      <span className={styles.legendLabel}>{label}</span>
+        {/* Harita boşluğu tıklama — panel kapatma */}
+        <MapClickHandler onClick={onMapClick} />
+      </MapContainer>
     </div>
   );
 }

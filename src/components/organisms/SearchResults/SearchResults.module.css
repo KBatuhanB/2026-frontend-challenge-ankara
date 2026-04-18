@@ -1,0 +1,108 @@
+/* SearchResults — Google tarzı arama sonuçları stilleri */
+
+/* Ana konteyner — arama sonuçları alanı */
+.container {
+  width: 100%;
+  max-width: 680px;
+  margin: 0 auto;
+  animation: slideUp 0.25s ease;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Sonuç sayısı */
+.count {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+  margin-bottom: var(--space-md);
+  padding-left: var(--space-xs);
+}
+
+/* Sonuç listesi */
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* Tek sonuç öğesi */
+.item {
+  position: relative;
+  list-style: none;
+}
+
+/* Kategori etiketi — sol üstte küçük badge */
+.typeTag {
+  position: absolute;
+  top: var(--space-sm);
+  right: var(--space-sm);
+  z-index: 2;
+  padding: 2px 8px;
+  font-size: 0.625rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  border-radius: var(--radius-full);
+  color: var(--color-text-primary);
+}
+
+.typeTag[data-type='checkin'] {
+  background: rgba(59, 130, 246, 0.2);
+  color: var(--category-checkins);
+}
+
+.typeTag[data-type='message'] {
+  background: rgba(245, 158, 11, 0.2);
+  color: var(--category-messages);
+}
+
+.typeTag[data-type='sighting'] {
+  background: rgba(20, 184, 166, 0.2);
+  color: var(--category-sightings);
+}
+
+.typeTag[data-type='personalNote'] {
+  background: rgba(168, 85, 247, 0.2);
+  color: var(--category-notes);
+}
+
+.typeTag[data-type='anonymousTip'] {
+  background: rgba(239, 68, 68, 0.2);
+  color: var(--category-tips);
+}
+
+/* Boş sonuç durumu */
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-xl) var(--space-md);
+}
+
+.emptyIcon {
+  font-size: 2rem;
+  opacity: 0.4;
+}
+
+.emptyText {
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+  text-align: center;
+}
+
+.emptyText strong {
+  color: var(--color-accent-gold);
+}

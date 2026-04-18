@@ -1,0 +1,18 @@
+/* ThreeDCard — 3D perspektif stilleri */
+
+.container {
+  perspective: 1000px;
+}
+
+.inner {
+  transform-style: preserve-3d;
+  transition: transform 200ms ease;
+}
+
+.body {
+  transform-style: preserve-3d;
+}
+
+.item {
+  transition: transform 200ms ease;
+}

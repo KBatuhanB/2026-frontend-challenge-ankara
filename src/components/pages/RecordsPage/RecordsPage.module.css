@@ -1,0 +1,24 @@
+/* RecordsPage — Investigation Board wrapper */
+
+.page {
+  min-height: 100vh;
+  background: var(--color-bg-primary);
+  padding-bottom: 100px; /* FloatingDock boşluğu */
+}
+
+/* Loading/Error */
+.stateContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  gap: var(--space-lg);
+  padding: var(--space-xl);
+}
+
+.stateText {
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+  font-style: italic;
+}

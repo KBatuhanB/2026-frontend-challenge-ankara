@@ -1,0 +1,281 @@
+/* InvestigationBoard — Dedektif ağı stilleri */
+
+/* ═══════════════════════════════════════════
+   Filter Bar — board üstünde sabit arama + filtre
+   ═══════════════════════════════════════════ */
+
+.filterBar {
+  display: flex;
+  justify-content: center;
+  padding: var(--space-lg) var(--space-lg) 0;
+}
+
+/* ═══════════════════════════════════════════
+   Board Container
+   ═══════════════════════════════════════════ */
+
+.board {
+  position: relative;
+  width: 100%;
+  overflow: visible;
+
+  /* Detective board background — blueprint grid + radial spotlight */
+  background:
+    radial-gradient(
+      ellipse 60% 50% at 50% 30%,
+      rgba(200, 165, 90, 0.04) 0%,
+      transparent 70%
+    ),
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 39px,
+      rgba(200, 165, 90, 0.035) 39px,
+      rgba(200, 165, 90, 0.035) 40px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 39px,
+      rgba(200, 165, 90, 0.035) 39px,
+      rgba(200, 165, 90, 0.035) 40px
+    ),
+    var(--color-bg-primary);
+}
+
+/* ═══════════════════════════════════════════
+   SVG Edge Layer
+   ═══════════════════════════════════════════ */
+
+.edgeLayer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* ═══════════════════════════════════════════
+   Node Wrapper — tüm kartlar bu div ile konumlanır
+   ═══════════════════════════════════════════ */
+
+.nodeWrapper {
+  position: absolute;
+  transform: translate(-50%, -50%); /* Merkez noktaya göre hizala */
+  z-index: 10;
+}
+
+/* ═══════════════════════════════════════════
+   Root Node
+   ═══════════════════════════════════════════ */
+
+.rootCard {
+  padding: 20px 24px;
+  background: rgba(26, 34, 53, 0.9);
+  border: 1.5px solid rgba(200, 165, 90, 0.3);
+  border-radius: var(--radius-lg);
+  text-align: center;
+  cursor: default;
+  box-shadow:
+    0 0 40px rgba(200, 165, 90, 0.08),
+    0 8px 32px rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.rootLabel {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  color: var(--color-accent-gold);
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+.rootTitle {
+  font-family: var(--font-display);
+  font-size: 1.375rem;
+  font-weight: 800;
+  color: var(--color-text-primary);
+  line-height: 1;
+  margin-bottom: 4px;
+}
+
+.rootSub {
+  font-family: var(--font-display);
+  font-size: 0.8125rem;
+  color: var(--color-text-secondary);
+  margin-bottom: 8px;
+}
+
+.rootMeta {
+  font-family: var(--font-mono);
+  font-size: 0.625rem;
+  color: var(--color-text-muted);
+  letter-spacing: 0.05em;
+}
+
+/* ═══════════════════════════════════════════
+   Category Node
+   ═══════════════════════════════════════════ */
+
+.catCard {
+  position: relative;
+  padding: 14px 16px;
+  background: rgba(26, 34, 53, 0.85);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  text-align: center;
+  cursor: pointer;
+  overflow: hidden;
+  transition:
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.catCard:hover {
+  border-color: var(--color-border-active);
+  box-shadow:
+    0 4px 20px rgba(0, 0, 0, 0.3),
+    0 0 20px rgba(200, 165, 90, 0.06);
+}
+
+.catCardExpanded {
+  border-color: var(--color-accent-gold);
+  box-shadow:
+    0 4px 20px rgba(0, 0, 0, 0.3),
+    0 0 30px rgba(200, 165, 90, 0.12);
+}
+
+/* Üst kenar aksent çizgisi */
+.catAccent {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  opacity: 0.8;
+}
+
+.catIcon {
+  margin-top: 4px;
+  margin-bottom: 4px;
+}
+
+.catTitle {
+  font-family: var(--font-display);
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  margin-bottom: 2px;
+}
+
+.catCount {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  color: var(--color-text-muted);
+  letter-spacing: 0.03em;
+}
+
+.catHint {
+  font-size: 0.625rem;
+  color: var(--color-text-muted);
+  margin-top: 4px;
+  opacity: 0.6;
+}
+
+/* ═══════════════════════════════════════════
+   Record Node
+   ═══════════════════════════════════════════ */
+
+.recCard {
+  position: relative;
+  padding: 10px 14px 10px 22px;
+  background: rgba(26, 34, 53, 0.8);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  text-align: left;
+  cursor: pointer;
+  transition:
+    border-color var(--transition-fast),
+    background var(--transition-fast),
+    box-shadow var(--transition-fast);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.25);
+}
+
+.recCard:hover {
+  border-color: var(--color-border-active);
+  background: rgba(26, 34, 53, 0.95);
+  box-shadow:
+    0 2px 12px rgba(0, 0, 0, 0.25),
+    0 0 15px rgba(200, 165, 90, 0.06);
+}
+
+.recCardMore {
+  text-align: center;
+  cursor: default;
+  opacity: 0.6;
+  padding-left: 14px;
+}
+
+/* Kategori renk noktası — sol kenar */
+.recDot {
+  position: absolute;
+  left: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+}
+
+.recTitle {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.2;
+}
+
+.recSub {
+  font-size: 0.6875rem;
+  color: var(--color-text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.2;
+}
+
+/* ═══════════════════════════════════════════
+   Responsive
+   ═══════════════════════════════════════════ */
+
+@media (max-width: 900px) {
+  .rootCard {
+    padding: 16px 18px;
+  }
+
+  .rootTitle {
+    font-size: 1.125rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .rootTitle {
+    font-size: 1rem;
+  }
+
+  .catTitle {
+    font-size: 0.8125rem;
+  }
+
+  .catCard {
+    padding: 10px 12px;
+  }
+}
