@@ -1,0 +1,33 @@
+# === Bağımlılıklar ===
+node_modules/
+
+# === Build çıktıları ===
+dist/
+dist-ssr/
+
+# === Ortam değişkenleri (API key güvenliği) ===
+.env
+.env.local
+.env.*.local
+
+# === Editor & IDE ===
+.vscode/*
+!.vscode/extensions.json
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# === İşletim sistemi dosyaları ===
+.DS_Store
+Thumbs.db
+
+# === Log dosyaları ===
+*.log
+npm-debug.log*
+
+# === Geçici dosyalar (veri keşfi sırasında oluşturulanlar) ===
+tmp_*.json
+temp-setup/

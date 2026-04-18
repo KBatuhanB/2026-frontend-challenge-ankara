@@ -1,0 +1,179 @@
+/*
+ * ============================================================
+ * Missing Podo: The Ankara Case — Global Stil Tanımları
+ * ============================================================
+ *
+ * Neden bu dosya?
+ * → CSS değişkenleri, reset kuralları ve tipografi ayarlarını
+ *   merkezi bir noktada tanımlayarak tüm bileşenlerde tutarlılık sağlar.
+ *   Bileşen bazlı stiller CSS Modules ile kapsüllenir,
+ *   ancak renk paleti ve spacing sistemi burada tanımlanır.
+ *
+ * Tasarım Felsefesi:
+ * → "Soruşturma dosyası" estetiği — koyu arka plan, keskin tipografi,
+ *   uyarı kırmızısı vurgular, dosya klasörü hissi.
+ */
+
+/* ─── Renk Paleti & Tema Değişkenleri ─── */
+:root {
+  /* Ana renkler — soruşturma/dedektiflik teması */
+  --color-bg-primary: #0a0e17;
+  --color-bg-secondary: #111827;
+  --color-bg-card: #1a2235;
+  --color-bg-card-hover: #1f2a3f;
+  --color-bg-modal: #141b2d;
+
+  /* Metin renkleri */
+  --color-text-primary: #e8edf5;
+  --color-text-secondary: #8b95a8;
+  --color-text-muted: #505a6e;
+
+  /* Vurgu renkleri — seviye bazlı (urgency/confidence) */
+  --color-accent-high: #ef4444;
+  --color-accent-medium: #f59e0b;
+  --color-accent-low: #6b7280;
+  --color-accent-info: #3b82f6;
+  --color-accent-success: #10b981;
+
+  /* Kenarlık & ayırıcılar */
+  --color-border: #1e293b;
+  --color-border-active: #334155;
+
+  /* Gölgeler */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.5);
+  --shadow-glow-red: 0 0 20px rgba(239, 68, 68, 0.15);
+
+  /* Spacing sistemi (8px grid) */
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+  --space-2xl: 48px;
+  --space-3xl: 64px;
+
+  /* Border radius */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-full: 9999px;
+
+  /* Tipografi */
+  --font-sans: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+  --font-display: 'Space Grotesk', 'Inter', sans-serif;
+
+  /* Geçiş süreleri */
+  --transition-fast: 150ms ease;
+  --transition-normal: 250ms ease;
+  --transition-slow: 400ms ease;
+
+  /* Z-index katmanları — çakışmayı önlemek için merkezi tanım */
+  --z-base: 1;
+  --z-sticky: 100;
+  --z-modal-backdrop: 500;
+  --z-modal: 510;
+  --z-tooltip: 600;
+
+  /* Maksimum içerik genişliği */
+  --max-width: 1200px;
+}
+
+/* ─── CSS Reset — Tarayıcılar arası tutarlılık ─── */
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  /* Kaydırma davranışını yumuşat — sayfa içi navigasyon için */
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--color-bg-primary);
+  color: var(--color-text-primary);
+  line-height: 1.6;
+  min-height: 100vh;
+  /* Sayfa geçişlerinde arka plan renginin kaymamasını sağlar */
+  overflow-x: hidden;
+}
+
+/* ─── Tipografi Temelleri ─── */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--color-text-primary);
+}
+
+a {
+  color: var(--color-accent-info);
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+
+a:hover {
+  color: var(--color-accent-success);
+}
+
+/* ─── Yardımcı Sınıflar ─── */
+
+/* Ekran okuyuculara özel — görsel olarak gizli ama erişilebilir */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* Scrollbar stilleri — soruşturma temasına uygun */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-bg-primary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-border-active);
+  border-radius: var(--radius-full);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-text-muted);
+}
+
+/* ─── Uygulama Kök Konteyneri ─── */
+#root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.app {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: var(--space-xl);
+  text-align: center;
+}
